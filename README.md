@@ -1,12 +1,12 @@
 ### 目标：  
-- 支持react全家桶  ✔  
-- 支持TS  ✔  
-- 热更新  ✔  
-- 代码兼容性  ✔  
-- assets模块相关  ✔  
-- eslint配置相关  
-- 支持单元测试Jest  
-- 解释package.json相关知识  
+- 支持react全家桶 ✔
+- 支持TS ✔
+- 热更新 ✔
+- 代码兼容性 ✔
+- assets模块相关 ✔
+- eslint配置相关 ❌
+- 支持单元测试Jest ❌
+- 解释package.json相关知识 ❌
 
 ## 目录  
 <a href="#1">初始化项目以及安装webpack</a>  
