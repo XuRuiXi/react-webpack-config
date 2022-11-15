@@ -29,7 +29,7 @@
 **<a id="1">初始化项目以及安装webpack</a>**  
 npm init初始化项目，生成package.json文件
 
-```json
+```javascript
 {
   "name": "react-webpack-config",
   "version": "1.0.0",
@@ -48,7 +48,7 @@ npm install -D webpack webpack-cli
 ```
 
 之后在scripts配置打包脚本
-```json
+```javascript
 "scripts": {
     "build": "webpack"
   },
@@ -71,7 +71,7 @@ node_modules\.bin\webpack
 这里介绍2种覆盖webpack配置的方法  
 第一种是在根目录新建webpack.config.js，在这里修改之后，配置默认走这里。
 第二种可以自定义js文件名，但是在执行命令的时候，加上配置文件的路径
-```json
+```javascript
 "build": "webpack --config xrx.webpack.config.js"
 ```
 ```javascript
@@ -216,7 +216,7 @@ const App = () => <div className='root'>REACT环境</div>
 createRoot(document.querySelector('#app')).render(<App />);
 ```
 配置loader
-```json
+```javascript
 {
   test: /\.css$/,
   // 使用多个loader的方式
@@ -254,7 +254,7 @@ createRoot(document.querySelector('#app')).render(<App />);
 ```
 
 配置loader
-```json
+```javascript
 {
   test: /\.css$/,
   // 使用多个loader的方式
@@ -381,7 +381,7 @@ npm run start
 
 因此我们添加配置，重新运行就完美了  
 
-```json
+```javascript
 mode: 'development', // 可以设置node/development/production,对打包的文件格式有影响
 performance: {
   "maxEntrypointSize": 1024 * 1024, // 入口文件超过多少会提示
@@ -421,7 +421,7 @@ options: {
 **browserslist**  
 处理兼容性问题，首先我们要明确兼容哪些平台。而配置这些目标平台的属性就是browserslist，它有几种方法可以声明，但我主要推荐以下2种。  
 在package.json声明
-```json
+```javascript
 {
   "browserslist": [
     "> 0.01%",
@@ -634,7 +634,7 @@ module.exports = {
 
 ----
 
-**<a href="9">typescript支持</a>** 
+**<a id="9">typescript支持</a>** 
 
 首先下载ts-loader
 ```
@@ -651,18 +651,29 @@ webpack.config.json配置
 },
 ```
 在根目录新建tsconfig.json。语法转换都在这里配置，详细的配置详情查看官网
-```json
+```javascript
 {
   "compilerOptions": {
-    "target": "ES5", //编译后的目标javascript版本， ES5, ES6/ES2015, ES2016, ES2017, ES2018, ES2019, ES2020, ESNext
+    "target": "ES5", // 编译后的目标javascript版本， ES5, ES6/ES2015, ES2016, ES2017, ES2018, ES2019, ES2020, ESNext
     "jsx": "react", // jsx编译成功react模式，生成React.createElement
     "esModuleInterop": true, //允许我们使用commonjs的方式import默认文件， import React from 'react'
   }
 }
-
 ```
 
 配置完这2个地方之后，就能正常书写ts和tsx文件了  
+
+**但是**，ts不会帮我们注入polyfill，这样配置的话某些低版本浏览器当用到Promise、Array.prototype.filter等，会出现报错。虽然也可以通过balbel-loader，结合@babel/preset-typescript插件帮我们编译ts代码。但是该插件是不会帮我们进行类型校验的。  
+
+**最完美的方案是babel-loader、ts-loader结合**，ts-loader处理完之后，交给babel-loader处理语法问题
+
+```javascript
+{
+  test: /\.(ts|tsx)$/,
+  exclude: /node_modules/, // 不处理的文件夹
+  use: ['babel-loader', 'ts-loader'],
+},
+```
 
 ----
 

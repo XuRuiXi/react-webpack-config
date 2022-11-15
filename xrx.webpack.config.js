@@ -9,7 +9,6 @@ module.exports = {
   mode: 'development',
   devtool: 'source-map',
   performance: {
-    "maxEntrypointSize": 1024 * 1024, // 入口文件超过多少会提示
     "maxAssetSize": 1024 * 1024 // 1m 打包的asset资源，超过多少会提示
   },
   output: {
@@ -17,6 +16,9 @@ module.exports = {
     filename: 'index.js',
     // publicPath: '',
     assetModuleFilename: 'resources/[name].[hash:5][ext]'
+  },
+  resolve: {
+    extensions: ['.js', 'jsx', '.json', '.ts', 'tsx'],
   },
   devServer: {
     host: 'localhost',
@@ -34,8 +36,8 @@ module.exports = {
       },
       {
         test: /\.(ts|tsx)$/,
-        loader: 'ts-loader',
         exclude: /node_modules/, // 不处理的文件夹
+        use: ['babel-loader', 'ts-loader'],
       },
       {
         test: /\.css$/,

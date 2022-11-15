@@ -11,8 +11,7 @@
         "corejs": "3" // useBuiltIns为usage时需要声明core-js的版本为3
       }
     ],
-    "@babel/preset-react",
-    "@babel/preset-typescript"
+    "@babel/preset-react"
   ],
   "plugins": ["react-refresh/babel"]
 }
