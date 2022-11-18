@@ -1,31 +1,18 @@
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
-const ReactRefreshPlugin = require('@pmmmwh/react-refresh-webpack-plugin');
 
 module.exports = {
-  entry: './src/index.js',
-  mode: 'development',
-  devtool: 'source-map',
+  entry: './src/index.tsx',
   performance: {
     "maxAssetSize": 1024 * 1024 // 1m 打包的asset资源，超过多少会提示
   },
-  output: {
-    path: path.resolve(__dirname, 'dist'),
-    filename: 'index.js',
-    // publicPath: '',
-    assetModuleFilename: 'resources/[name].[hash:5][ext]'
-  },
+  // 自动补全省略的后缀
   resolve: {
-    extensions: ['.js', 'jsx', '.json', '.ts', 'tsx'],
-  },
-  devServer: {
-    host: 'localhost',
-    port: 5200,
-    compress: true, // 服务器压缩
-    open: false, // 自动打开页面
-    hot: true, // 热更新(默认开启)
+    extensions: ['.js', '.jsx', '.json', '.ts', '.tsx'],
+    alias: {
+      '@': path.resolve(__dirname, '../src'),
+    },
   },
   module: {
     rules: [
@@ -98,12 +85,6 @@ module.exports = {
     ]
   },
   plugins: [
-    new ReactRefreshPlugin(),
-    // **/*表示会取output.path的目录
-    // !取反，表示不会被删除
-    new CleanWebpackPlugin({
-      cleanOnceBeforeBuildPatterns: ['**/*', '!不会被删除的文件.html']
-    }),
     new HtmlWebpackPlugin({
       template: './src/public/ignoreResources/index.html'
     }),
@@ -116,8 +97,12 @@ module.exports = {
           globOptions: {
             ignore: ["**/ignoreResources/**"],
           },
+        },
+        {
+          from: './src/public/ignoreResources/favicon.ico',
+          to: '.',
         }
       ]
     })
   ]
-}
+};

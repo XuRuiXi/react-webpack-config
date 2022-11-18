@@ -1,4 +1,9 @@
-{
+
+const env = process.env.NODE_ENV;
+let plugins = [];
+if (env === 'development') plugins = [...plugins, "react-refresh/babel"];
+
+module.exports = {
   "presets": [
     [
       "@babel/preset-env",
@@ -13,5 +18,5 @@
     ],
     "@babel/preset-react"
   ],
-  "plugins": ["react-refresh/babel"]
+  plugins,
 }

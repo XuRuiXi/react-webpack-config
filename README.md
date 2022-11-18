@@ -3,8 +3,7 @@
 - 支持TS ✔
 - 热更新 ✔
 - 代码兼容性 ✔
-- assets模块相关 ✔
-- eslint配置相关 ❌
+- eslint配置相关 ✔
 - 支持单元测试Jest ❌
 - 解释package.json相关知识 ❌
 
@@ -22,7 +21,15 @@
 <a href="#7">代码兼容性处理</a>  
 <a href="#8">抽离.babelrc和postcss.config.js</a>  
 <a href="#9">typescript支持</a>  
+- <a href="#typescript模块声明">typescript模块声明</a>  
+
 <a href="#10">资源模块(asset module)</a>  
+<a href="#11">eslint支持</a>  
+<a href="#12">devtool（source-map）</a>  
+<a href="#13">路径自动补全(resolve)</a>  
+<a href="#14">本地开发服务的history模式</a>  
+<a href="#15">配置环境变量</a>  
+<a href="#16">配置文件拆分</a>  
 
 ----
 
@@ -675,6 +682,51 @@ webpack.config.json配置
 },
 ```
 
+
+**<a id="typescript模块声明">typescript模块声明</a>**  
+在ts里面，导入的模块都需要有声明。但如果我们有些文件是js写的，或者第三方插件用js写的。他们自身并没有声明文件。这时候就需要我们自己定义声明文件。或者下载官方的@types/**声明文件。  
+
+**@types**  
+
+我们看node_modules下的@types目录，这里我们已经有下载好某些声明文件，例如react和react-dom。  
+
+![](./src/assets/images/截图13.png)
+
+所以我们才能在ts文件里面导入react和react-dom不会有错误提示。
+
+**自定义声明文件**  
+
+我们在导入.less/.png/.svg等等文件时，如果我们没有找到对应的@types声明，这就需要我们手动写.d.ts声明文件（可以在项目的任何地方写，只要是.d.ts拓展名就行）。  
+例如我们在根目录新建声明文件  
+
+**types.d.ts**
+
+```typescript
+declare module '*.less' {
+  const less: { readonly [key: string]: string };
+  export default less;
+}
+
+declare module '*.css';
+declare module '*.png';
+declare module '*.jpg';
+
+declare module '*.svg' {
+  export function ReactComponent(props: React.SVGProps<SVGSVGElement>): React.ReactElement;
+  const url: string;
+  export default url;
+}
+
+```
+
+如果声明不加任何导出，例如  
+
+```typescript
+declare module '*.png';
+```
+就表示该模块导出的是**any**类型
+
+
 ----
 
 **<a id="10">资源模块(asset module)</a>**  
@@ -810,4 +862,74 @@ output.assetModuleFilename: 'resources/[name].[hash:5][ext]'
 
 可以看出没有独立配置filename的svg，被放进了assetModuleFilename设置的目录
 而且小于80kb的图片被打包成base64放进了html里面
+
+
+**<a id="11">eslint支持</a>**  
+
+需要项目支持eslint，首先我们需要下载eslint
+```
+npm install -D eslint
+```
+然后执行.bin目录下的eslinit --init指令
+
+```
+.\node_modules\.bin\eslint --init
+```
+或者使用npx都可以
+```
+npx eslint --init
+```
+
+执行这两个命令之后，按照要求回答一些问题然后会自动下载需要的依赖文件，以及在根目录生成.eslintrc.js文件。
+
+**但是，我们打算从0来配置一遍**  
+
+首先vscode下载eslint插件并启用。
+
+```
+npm install -D eslint @typescript-eslint/eslint-plugin @typescript-eslint/parser eslint-plugin-react eslint-plugin-html
+```
+
+在项目根目录新建eslint配置文件
+.eslintrc.js
+
+```javascript
+module.exports = {
+  parser:  '@typescript-eslint/parser',  // 指定ESLint解析器
+  env: {
+    browser: true,
+    es6: true,
+    node: true,
+  },
+  extends: [
+    'plugin:react/recommended', // 使用来自 @eslint-plugin-react 的推荐规则
+    'plugin:@typescript-eslint/recommended',  // 使用来自@typescript-eslint/eslint-plugin的推荐规则
+  ],
+  overrides: [],
+  parserOptions: {},
+  plugins: [
+    'html', // html文件检测
+  ],
+  rules: {
+    "no-console": 1,
+    "no-alert": 1,
+    semi: [2, "always"], // 语句强制分号结尾
+    "@typescript-eslint/no-inferrable-types": 0, // 简单类型的变量不用声明类型 const a:bumber=12
+    "@typescript-eslint/no-var-requires": 0, // 以const module = require()不报错
+  },
+};
+
+```
+
+这时eslint就生效了。
+
+
+**<a id="12">devtool（source-map）</a>**  
+
+配置
+```javascript
+  devtool: 'source-map', // 其他参数功能请参考官方文档
+```
+该模式下，报错的时候，在浏览器就能够定位到具体代码行数和列（生成map文件，打包代码和原代码一一对应）
+![](./src/assets/images/截图14.png)  
 
