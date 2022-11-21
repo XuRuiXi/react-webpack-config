@@ -20,5 +20,6 @@ module.exports = {
     semi: [2, "always"], // 语句强制分号结尾
     "@typescript-eslint/no-inferrable-types": 0, // 简单类型的变量不用声明类型 const a:bumber=12
     "@typescript-eslint/no-var-requires": 0, // 以const module = require()不报错
+    "react/prop-types": 0, // 关闭react props的propTypes类型校验
   },
 };

@@ -4,36 +4,43 @@
 - 热更新 ✔
 - 代码兼容性 ✔
 - eslint配置相关 ✔
-- 支持单元测试Jest ❌
+- 支持单元测试Jest ✔
 - 解释package.json相关知识 ❌
 
 ## 目录  
-<a href="#1">初始化项目以及安装webpack</a>  
-<a href="#2">修改webpack配置，配置入口文件、输出文件</a>  
-<a href="#3">配置react开发环境~~介绍babel-loader</a>  
-<a href="#4">配置css、less相关loader</a>  
-<a href="#5">webpack插件</a>  
+<a href="#初始化项目以及安装webpack">初始化项目以及安装webpack</a>  
+<a href="#修改webpack配置，配置入口文件、输出文件">修改webpack配置，配置入口文件、输出文件</a>  
+<a href="#配置react开发环境~~介绍babel-loader">配置react开发环境~~介绍babel-loader</a>  
+<a href="#配置css、less相关loader">配置css、less相关loader</a>  
+<a href="#webpack插件">webpack插件</a>  
 - <a href="#html-webpack-plugin">html-webpack-plugin</a>  
 - <a href="#clean-webpack-plugin">clean-webpack-plugin</a>  
 - <a href="#copy-webpack-plugin">copy-webpack-plugin</a>  
 
-<a href="#6">从热更新到模块热替换(hot module replacement 或 HMR)</a>  
-<a href="#7">代码兼容性处理</a>  
-<a href="#8">抽离.babelrc和postcss.config.js</a>  
-<a href="#9">typescript支持</a>  
+<a href="#从热更新到模块热替换(hot module replacement 或 HMR)">从热更新到模块热替换(hot module replacement 或 HMR)</a>  
+<a href="#代码兼容性处理">代码兼容性处理</a>  
+<a href="#抽离.babelrc和postcss.config.js">抽离.babelrc和postcss.config.js</a>  
+<a href="#typescript支持">typescript支持</a>  
 - <a href="#typescript模块声明">typescript模块声明</a>  
 
-<a href="#10">资源模块(asset module)</a>  
-<a href="#11">eslint支持</a>  
-<a href="#12">devtool（source-map）</a>  
-<a href="#13">路径自动补全(resolve)</a>  
-<a href="#14">本地开发服务的history模式</a>  
-<a href="#15">配置环境变量</a>  
-<a href="#16">配置文件拆分</a>  
+<a href="#资源模块(asset module)">资源模块(asset module)</a>  
+<a href="#eslint支持">eslint支持</a>  
+<a href="#Jest单元测试">Jest单元测试</a>  
+<a href="#devtool（source-map）">devtool（source-map）</a>  
+<a href="#路径自动补全(resolve)">路径自动补全(resolve)</a>  
+<a href="#本地开发服务的history模式">本地开发服务的history模式</a>  
+<a href="#配置环境变量">配置环境变量</a>  
+<a href="#配置文件拆分">配置文件拆分</a>  
+
+---  
+**补充**  
+<a href="#package.json属性说明">package.json属性说明</a>  
+
+
 
 ----
 
-**<a id="1">初始化项目以及安装webpack</a>**  
+**<a id="初始化项目以及安装webpack">初始化项目以及安装webpack</a>**  
 npm init初始化项目，生成package.json文件
 
 ```javascript
@@ -73,7 +80,7 @@ node_modules\.bin\webpack
 
 ----
 
-**<a id="2">修改webpack配置，配置入口文件、输出文件</a>**  
+**<a id="修改webpack配置，配置入口文件、输出文件">修改webpack配置，配置入口文件、输出文件</a>**  
 
 这里介绍2种覆盖webpack配置的方法  
 第一种是在根目录新建webpack.config.js，在这里修改之后，配置默认走这里。
@@ -102,7 +109,7 @@ publicPath：默认是/，资源的存放路径（和服务器部署的路径有
 
 ----
 
-**<a id="3">配置react开发环境~~介绍babel-loader</a>**  
+**<a id="配置react开发环境~~介绍babel-loader">配置react开发环境~~介绍babel-loader</a>**  
 想要使用react，那我们首先要下载react、react-dom
 ```
 npm install react react-dom
@@ -196,7 +203,7 @@ module: {
 
 ----
 
-**<a id="4">配置css、less相关loader</a>**  
+**<a id="配置css、less相关loader">配置css、less相关loader</a>**  
 
 处理css文件我们需要2个loader。
 ```
@@ -295,7 +302,7 @@ import styles from './test.less';
 <div className={styles.background} />
 ```
 
-**<a id="5">webpack插件</a>**  
+**<a id="webpack插件">webpack插件</a>**  
 
 **<a id="html-webpack-plugin">html-webpack-plugin</a>**  
 
@@ -354,7 +361,7 @@ new CopyWebpackPlugin({
 
 ----
 
-**<a id="6">从热更新到模块热替换(hot module replacement 或 HMR)</a>**  
+**<a id="从热更新到模块热替换(hot module replacement 或 HMR)">从热更新到模块热替换(hot module replacement 或 HMR)</a>**  
 
 webpack5的热更新用到webpack-dev-server插件，同时在配置文件设置devServer。
 ```
@@ -423,7 +430,7 @@ options: {
 
 ----
 
-**<a id="7">代码兼容性处理</a>**  
+**<a id="代码兼容性处理">代码兼容性处理</a>**  
 
 **browserslist**  
 处理兼容性问题，首先我们要明确兼容哪些平台。而配置这些目标平台的属性就是browserslist，它有几种方法可以声明，但我主要推荐以下2种。  
@@ -568,7 +575,7 @@ npm i core-js regenerator-runtime
 
 ----
 
-**<a id="8">抽离.babelrc和postcss.config.js</a>**  
+**<a id="抽离.babelrc和postcss.config.js">抽离.babelrc和postcss.config.js</a>**  
 
 为了便于维护以及提高复用性，webpack允许将babel-loader和postcss-loader的配置独立出来。  
 在根目录下新建.babelrc  
@@ -641,7 +648,7 @@ module.exports = {
 
 ----
 
-**<a id="9">typescript支持</a>** 
+**<a id="typescript支持">typescript支持</a>** 
 
 首先下载ts-loader
 ```
@@ -729,7 +736,7 @@ declare module '*.png';
 
 ----
 
-**<a id="10">资源模块(asset module)</a>**  
+**<a id="资源模块(asset module)">资源模块(asset module)</a>**  
 
 webpack5后，内置了模块类型，无需再下载额外loader。  
 配置
@@ -864,7 +871,7 @@ output.assetModuleFilename: 'resources/[name].[hash:5][ext]'
 而且小于80kb的图片被打包成base64放进了html里面
 
 
-**<a id="11">eslint支持</a>**  
+**<a id="eslint支持">eslint支持</a>**  
 
 需要项目支持eslint，首先我们需要下载eslint
 ```
@@ -923,13 +930,396 @@ module.exports = {
 
 这时eslint就生效了。
 
+**<a id="Jest单元测试">Jest单元测试</a>**  
 
-**<a id="12">devtool（source-map）</a>**  
+首先下载Jest
+```
+npm install -D jest
+```
+
+在根目录新建test文件夹
+然后再src目录下创建sum.js
+```javascript
+const sum = (a, b) => a + b;
+export default sum;
+```  
+
+然后再test目录下创建sum.test.js  
+```javascript
+// 默认只支持commonJs
+const sum = require('../src/index').default;
+test('1 + 2 = 3', () => {
+  expect(sum(1, 2)).toBe(3);
+});
+```
+
+在package.json配置测试脚本
+```javascript
+"scripts": {
+  "test": "jest"
+},
+```
+
+**Jest支持typescript和ESM**
+
+支持ESM只需要引入babel的预设@babel/preset-env就可以了，支持typescript需要我们在babel引入@babel/preset-typescript。
+
+```
+npm install -D @babel/preset-typescript @babel/preset-env @types/jest
+```
+
+ps：ts文件的jest模块声明（@types/jest）
+
+所以.babelrc.js
+```javascript
+module.exports = {
+  presets: [
+    [
+      "@babel/preset-env",
+    ],
+  "@babel/preset-typescript"
+  ]
+}
+```
+
+**提示：** 在Jest里有一个babel-jest组件，我们在使用npm run test的时候，它先去检测开发环境中是否安装了babel,如果有就会去查看.babelrc配置文件，根据配置文件进行转换。  
+
+<mark>验证</mark>
+
+然后再src目录下创建sum.ts
+```javascript
+const sum = (a:number, b:number):number => a + b;
+export default sum;
+```  
+
+然后再test目录下创建sum.test.ts  
+```typescript
+// 默认只支持commonJs
+import sum from '../src/sum';
+test('1 + 2 = 3', () => {
+  expect(sum(1, 2)).toBe(3);
+});
+```
+
+执行
+
+```
+npm run test
+```
+
+![](./src/assets/images/截图15.png)  
+
+
+---
+
+
+**<a id="devtool（source-map）">devtool（source-map）</a>**  
 
 配置
 ```javascript
+module.exports = {
   devtool: 'source-map', // 其他参数功能请参考官方文档
+}
 ```
 该模式下，报错的时候，在浏览器就能够定位到具体代码行数和列（生成map文件，打包代码和原代码一一对应）
 ![](./src/assets/images/截图14.png)  
 
+---
+
+**<a id="路径自动补全(resolve)">路径自动补全(resolve)</a>**  
+
+
+配置
+```javascript
+module.exports = {
+  // 自动补全省略的后缀
+  resolve: {
+    extensions: ['.js', '.jsx', '.json', '.ts', '.tsx'],
+    alias: {
+      '@': path.resolve(__dirname, './src'),
+    },
+  },
+}
+```
+extensions表示省略文件后缀时，自动帮我们补全的后缀。  
+alias表示路径补全  
+__dirname表示webpack配置文件的执行目录  
+然后我们就可以这样使用了
+```javascript
+import 组件一 from '@/components/TsCop';
+```
+
+---
+
+**<a id="本地开发服务的history模式">本地开发服务的history模式</a>**  
+
+我们在使用react-router开发，路由模式有history/hash模式。当时我们开启本地服务器开发时，如果使用了history模式，如果不进行相应的设置，进入某个路由之后，刷新页面会出现404的情况。那是因为浏览器根据url进行了资源请求，但是资源为空导致404。  
+
+webpack根据这种情况也给出了解决方案，
+
+```javascript
+module.exports = {
+devServer: {
+    host: 'localhost',
+    port: 5200,
+    compress: true, // 服务器压缩
+    open: false, // 自动打开页面
+    hot: true, // 热更新(默认开启)
+    historyApiFallback: {
+      index: '/index.html'
+    },
+  },
+}
+```
+
+核心就是这段配置，如果匹配不到资源的时候，总是返回/index.html
+```javascript
+historyApiFallback: {
+  index: '/index.html'
+},
+```
+
+
+---
+
+**<a id="配置环境变量">配置环境变量</a>**  
+
+我们可以在正在执行命令的时候，可以给NODE环境设置一个变量，通过process.env.xxxxx来获取。但是不同的平台，指令有些不同。为了解决这一问题，我们通过cross-env设置环境变量，可以很好的是适配多个平台。
+
+```
+npm install -D cross-env
+```
+
+package.json（这里设置了process.env.NODE_ENV === 'development'，然后我们就能在编译阶段拿到该变量）
+```json
+"start": "cross-env NODE_ENV=development webpack-dev-server --config xrx.webpack.config.js",
+```
+
+---
+
+**<a id="配置文件拆分">配置文件拆分</a>**  
+
+到目前为止，我们本地开发和打包上线，用的都是同一份配置文件。但这是不合理的，例如  **@pmmmwh/react-refresh-webpack-plugin**  只有在本地开发时才用到，打包的时候不需要。  
+
+所以，我们把webpack.config.js拆分成3份  
+**base.config.js：** 通用的配置  
+**dev.config.js：** 开发环境的配置  
+**prod.config.js：** 打包生产的配置  
+
+然后再通过webpack-merge插件提供的merge方法，将配置组合。
+
+
+设置环境变量，我们统一配置文件入口为./config/webpack.config.js  
+
+package.json设置脚本
+```json
+  "scripts": {
+    "build": "cross-env NODE_ENV=production webpack --config config/webpack.config.js",
+    "start": "cross-env NODE_ENV=development webpack-dev-server --config config/webpack.config.js",
+    "test": "cross-env NODE_ENV=test jest"
+  },
+```
+
+./config/base.config.js  
+```javascript
+const path = require('path');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+const CopyWebpackPlugin = require('copy-webpack-plugin');
+
+module.exports = {
+  entry: './src/index.tsx',
+  performance: {
+    "maxAssetSize": 1024 * 1024 // 1m 打包的asset资源，超过多少会提示
+  },
+  // 自动补全省略的后缀
+  resolve: {
+    extensions: ['.js', '.jsx', '.json', '.ts', '.tsx'],
+    alias: {
+      '@': path.resolve(__dirname, '../src'),
+    },
+  },
+  module: {
+    rules: [
+      {
+        test: /\.js$/,
+        loader: 'babel-loader',
+        exclude: /node_modules/, // 不处理的文件夹
+      },
+      {
+        test: /\.(ts|tsx)$/,
+        exclude: /node_modules/, // 不处理的文件夹
+        use: ['babel-loader', 'ts-loader'],
+      },
+      {
+        test: /\.css$/,
+        // 使用多个loader的方式
+        use: [
+          'style-loader',
+          {
+            loader: 'css-loader',
+            options: {
+              importLoaders: 1,
+            }
+          },
+          'postcss-loader'
+        ]
+      },
+      {
+        test: /\.less$/,
+        // 使用多个loader的方式  
+        use: [
+          'style-loader',
+          {
+            loader: 'css-loader',
+            options: {
+              modules: {
+                localIdentName: '[local]_[hash:5]'
+              },
+              importLoaders: 1,
+            }
+          },
+          'postcss-loader',
+          'less-loader'
+        ]
+      },
+      // webpack5开始，静态资源统一由asset模块处理
+      {
+        test: /\.(jpg|jpeg|png|gif)$/,
+        type: 'asset',
+        generator: {
+          filename: 'images/[name].[hash:10][ext]'
+        },
+        parser: {
+          dataUrlCondition: {
+            maxSize: 100 * 1024 // 80kb
+          }
+        }
+      },
+      {
+        test: /\.ttf$/,
+        type: 'asset/resource',
+        generator: {
+          filename: 'fonts/[name].[hash:10][ext]'
+        }
+      },
+      {
+        test: /\.svg$/,
+        type: 'asset/resource'
+      }
+    ]
+  },
+  plugins: [
+    new HtmlWebpackPlugin({
+      template: './src/public/ignoreResources/index.html'
+    }),
+    // ignore表示不会被复制的目录
+    new CopyWebpackPlugin({
+      patterns: [
+        {
+          from: './src/public',
+          to: 'public',
+          globOptions: {
+            ignore: ["**/ignoreResources/**"],
+          },
+        },
+        {
+          from: './src/public/ignoreResources/favicon.ico',
+          to: '.',
+        }
+      ]
+    })
+  ]
+};
+```
+
+./config/dev.config.js  
+```javascript
+const ReactRefreshPlugin = require('@pmmmwh/react-refresh-webpack-plugin');
+module.exports = {
+  mode: 'development',
+  devtool: 'source-map',
+  devServer: {
+    host: 'localhost',
+    port: 5200,
+    compress: true, // 服务器压缩
+    open: false, // 自动打开页面
+    hot: true, // 热更新(默认开启)
+    historyApiFallback: {
+      index: '/index.html'
+    },
+  },
+  plugins: [
+    new ReactRefreshPlugin(),
+  ]
+};
+```
+
+./config/prod.config.js  
+```javascript
+const path = require('path');
+const { CleanWebpackPlugin } = require('clean-webpack-plugin');
+
+module.exports = {
+  mode: 'production',
+  devtool: 'eval',
+  output: {
+    path: path.resolve(__dirname, '../dist'),
+    filename: 'index.js',
+    // publicPath: '',
+    assetModuleFilename: 'resources/[name].[hash:5][ext]'
+  },
+  plugins: [
+    // **/*表示会取output.path的目录
+    // !取反，表示不会被删除
+    new CleanWebpackPlugin({
+      cleanOnceBeforeBuildPatterns: ['**/*', '!不会被删除的文件.html']
+    }),
+  ]
+};
+```
+
+./config/webpack.config.js  
+```javascript
+const { merge } = require('webpack-merge');
+const baseConfig = require('./base.config');
+const env = process.env.NODE_ENV;
+let config = '';
+if (env === 'production') {
+  config = require('./prod.config');
+} else if (env === 'development') {
+  config = require('./dev.config');
+}
+module.exports = merge(baseConfig, config);
+```
+
+在.babelrc.js
+```javascript
+const env = process.env.NODE_ENV;
+let plugins = [];
+let presets = [
+  [
+    "@babel/preset-env",
+    {
+      // false 不使用任何的polyfill
+      // 以下的两个值可能会发生冲突(加入第三方库如果实现了关于polyfill相关的西，你再实现 会有冲突的问题)，解决：在babel-loader中加入exclude属性
+      // usage 根据源代码需要哪些polyfil就引入相关的api
+      // entry 只要是浏览器需要的polyfill都引入(不是根据源代码应用哪polyfill)
+      "useBuiltIns": "usage", // false "usage" "entry"
+      "corejs": "3", // useBuiltIns为usage时需要声明core-js的版本为3
+    }
+  ],
+  "@babel/preset-react",
+]
+if (env === 'development') plugins = [...plugins, "react-refresh/babel"];
+if (env === 'test') presets = [...presets, "@babel/preset-typescript"];
+module.exports = {
+  presets,
+  plugins,
+}
+```
+
+这样我们就能够根据环境变量加载不同的配置了。
+
+---
+
+**<a id="package.json属性说明">package.json属性说明</a>**  

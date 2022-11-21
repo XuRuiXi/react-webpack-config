@@ -10,8 +10,8 @@ module.exports = {
     open: false, // 自动打开页面
     hot: true, // 热更新(默认开启)
     historyApiFallback: {
-      index:'/index.html'
-  },
+      index: '/index.html'
+    },
   },
   plugins: [
     new ReactRefreshPlugin(),

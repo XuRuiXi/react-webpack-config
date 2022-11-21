@@ -1,11 +1,17 @@
 import React from 'react';
 
-const TsCop = () => {
+interface props {
+  title?: string;
+}
+
+const TsCop = (props: props) => {
+  const { title = '组件一' } = props;
   return (
     <div>
-      组件一
+      {title}
     </div>
-  );
+  )
 };
+
 
 export default TsCop;
