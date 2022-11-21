@@ -23,6 +23,6 @@ const App = () => {
       <img src={Fog} />
     </div>
   );
-}
+};
 
 createRoot(document.querySelector('#app')).render(<App />);

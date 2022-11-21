@@ -10,7 +10,7 @@ const TsCop = (props: props) => {
     <div>
       {title}
     </div>
-  )
+  );
 };
 
 
