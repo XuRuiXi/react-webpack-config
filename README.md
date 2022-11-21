@@ -5,6 +5,7 @@
 - 代码兼容性 ✔
 - eslint配置相关 ✔
 - 支持单元测试Jest ✔
+- husky代码提交校验 ✔
 - 解释package.json相关知识 ❌
 
 ## 目录  
@@ -31,6 +32,7 @@
 <a href="#本地开发服务的history模式">本地开发服务的history模式</a>  
 <a href="#配置环境变量">配置环境变量</a>  
 <a href="#配置文件拆分">配置文件拆分</a>  
+<a href="#husky代码提交校验">husky代码提交校验</a>  
 
 ---  
 **补充**  
@@ -1319,6 +1321,100 @@ module.exports = {
 ```
 
 这样我们就能够根据环境变量加载不同的配置了。
+
+---
+
+**<a id="husky代码提交校验">husky代码提交校验</a>**  
+
+通过husky可以配置githooks的操作，但是husky在6.0.0之后有了破坏性的改变。
+
+同时，我们还需要lint-staged，这个插件可以让我们只检测暂存区的文件。（如果我们不嫌弃每次全量eslint检测全量的文件，也可以不用这个）  
+```
+npm install -D husky lint-staged
+```
+
+在继续执行命令之前，先看一下旧版本(< 6.0.0)的配置方式，方便解释接下来的操作。  
+**在6.0.0之前**
+package.json
+```json
+"scripts": {
+  "lint-staged": "lint-staged",
+},
+"lint-staged": {
+    "*.{js,jsx,ts,tsx}": [
+      "eslint"
+    ]
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+```
+我摘录下官方说法的网上翻译
+```
+husky为什么放弃了之前的配置方式
+根据官方的说法，之前husky的工作方式是这样的，为了能够让用户设置任何类型的git hooks都能正常工作，husky不得不创建所有类型的git hooks。这样在git 工作的每个阶段都会调用husky所设置的脚本，在这个脚本中husky会检查用户是否配置该hook，如果有就运行用户配置的命令，如果没有就继续往下执行。
+
+这样做的好处就是无论用户设置什么类型的git hook husky都能确保其正常运行。但是缺点也是显而易见的，即使用户没有设置任何git hook，husky也向git中添加了所有类型的git hook。
+
+那有没有可能让husky只添加我们需要的git hook呢？作者尝试过解决这个问题，但是失败了。究其失败的根本原因，就是因为husky需要在两个地方进行配置才能完成一个完整的git hook功能。一个是在package.json中配置git hook所要执行的真正命令，一个是在.git/hooks/中配置相对应的git hook。也就是说无论是添加还是删除git hook就要保证在这两个地方同步执行对应的操作。作者无法找到一个可靠的方法来同步这两个地方的配置，因此失败了。
+
+作者认为这个问题是由husky工作模型的自身缺陷导致的，如果想要解决就不得不另辟蹊径采用一种新的工作模型。因此新版husky做了破坏性的变更。
+
+新版husky的工作原理
+新版的husky使用了从git 2.9开始引入的一个新功能core.hooksPath。core.hooksPath可以让你指定git hooks所在的目录而不是使用默认的.git/hooks/。这样husky可以使用husky install将git hooks的目录指定为.husky/，然后使用husky add命令向.husky/中添加hook。通过这种方式我们就可以只添加我们需要的git hook，而且所有的脚本都保存在了一个地方（.husky/目录下）因此也就不存在同步文件的问题了。
+```
+
+所以现在的操作：
+首先配置prepare脚本
+```json
+{
+  "scripts": {
+    "prepare": "husky install"
+  }
+}
+
+```
+
+prepare是npm的一个生命周期，它会在执行完npm install之后执行。  
+
+执行 husky install命令，该命令会创建.husky/目录并指定该目录为git hooks所在的目录。
+
+**然后**  
+添加git hooks，运行一下命令创建git hooks
+
+```
+npx husky add .husky/pre-commit "npm run lint-staged"
+```
+
+运行完该命令后我们会看到.husky/目录下新增了一个名为pre-commit的shell脚本。也就是说在在执行git commit命令时会先执行pre-commit这个脚本。pre-commit脚本内容如下：
+
+```shell
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+npm run lint-staged
+```
+
+可以看到该脚本的功能就是执行npm run lint-staged这个命令
+
+package.json
+```json
+"scripts": {
+  "lint-staged": "lint-staged",
+  "prepare": "husky install"
+},
+"lint-staged": {
+  "*.{js,jsx,ts,tsx}": [
+    "eslint"
+  ]
+},
+```
+
+配置完成后，当我们commit代码的时候，会基于eslint配置的规则，校验我们暂存区的代码，只有校验通过之后能提交。
+
+
+
 
 ---
 
