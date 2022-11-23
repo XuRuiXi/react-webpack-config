@@ -6,7 +6,7 @@
 - eslint配置相关 ✔
 - 支持单元测试Jest ✔
 - husky代码提交校验 ✔
-- 解释package.json相关知识 ❌
+- 解释package.json相关知识 ✔
 
 ## 目录  
 <a href="#初始化项目以及安装webpack">初始化项目以及安装webpack</a>  
@@ -36,8 +36,8 @@
 
 ---  
 **补充**  
-<a href="#package.json属性说明">package.json属性说明</a>  
-
+<a href="#package.json相关说明">package.json相关说明</a>  
+<a href="#.npmrc">.npmrc</a>  
 
 
 ----
@@ -1418,4 +1418,44 @@ package.json
 
 ---
 
-**<a id="package.json属性说明">package.json属性说明</a>**  
+**<a id="package.json相关说明">package.json相关说明</a>**  
+
+- **dependencies和devDependencies区别**  
+
+  在本地开发时，没有本质的区别。只有在发布npm包时，如果对方使用npm包，在开发依赖里面的模块不会被对方下载。
+
+- **依赖包安装共享与冲突解决**  
+
+  npm会把依赖和依赖的依赖，平铺安装在node_mudules下共享使用，如果遇到依赖版本有冲突，会把其中一个依赖放到依赖的node_modules下
+
+- **版本符号**  
+
+  ~：  指定主版本号或者次版本号相同
+
+  |  版本范围 | 匹配版本  |
+  | ------------ | ------------ |
+  | ~3  | 3.x 或者 3.0.0 <= v < 4.0.0 |
+  | ~3.1  |  3.1.x 或者 3.1.0 <= v <3.2.0 |
+  |  ~3.1.2 | 3.1.2 < v < 3.2.0  |
+
+  ^：  第一个非零 版本号相同
+
+  |  版本范围 | 匹配版本  | 补充  |
+  | ------------ | ------------ | ------------ |
+  | ^3.1.5  | 3.1.5 <= v < 4.0.0 |  |
+  | ^0.3.6  | 0.3.6 <= v < 0.4.0 |  |
+  | ^0.0.2  | 0.0.2 <= v < 0.0.3 |  |
+  | ^3.x.x  | 3.0.0 <= v < 4.0.0 | 版本号缺少的位置，会被 0 填充 |
+  | ^4.2.x  | 4.2.0 <= v < 4.3.0 |  |
+
+
+**<a id=".npmrc">.npmrc</a>**  
+
+在项目的根目录下新建 .npmrc 文件
+
+```
+registry=https://registry.npm.taobao.org/
+@test:registry = https://npm.xx.com
+```
+
+以@test 开头的包从 registry=https://npm.xx.com 这里下载，其余全去淘宝镜像下载。
