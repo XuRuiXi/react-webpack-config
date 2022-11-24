@@ -38,7 +38,7 @@
 **补充**  
 <a href="#package.json相关说明">package.json相关说明</a>  
 <a href="#.npmrc">.npmrc</a>  
-
+<a href="#幽灵依赖">幽灵依赖</a>  
 
 ----
 
@@ -1414,8 +1414,6 @@ package.json
 配置完成后，当我们commit代码的时候，会基于eslint配置的规则，校验我们暂存区的代码，只有校验通过之后能提交。
 
 
-
-
 ---
 
 **<a id="package.json相关说明">package.json相关说明</a>**  
@@ -1423,10 +1421,6 @@ package.json
 - **dependencies和devDependencies区别**  
 
   在本地开发时，没有本质的区别。只有在发布npm包时，如果对方使用npm包，在开发依赖里面的模块不会被对方下载。
-
-- **依赖包安装共享与冲突解决**  
-
-  npm会把依赖和依赖的依赖，平铺安装在node_mudules下共享使用，如果遇到依赖版本有冲突，会把其中一个依赖放到依赖的node_modules下
 
 - **版本符号**  
 
@@ -1448,6 +1442,28 @@ package.json
   | ^3.x.x  | 3.0.0 <= v < 4.0.0 | 版本号缺少的位置，会被 0 填充 |
   | ^4.2.x  | 4.2.0 <= v < 4.3.0 |  |
 
+- **package.lock.json**  
+
+  因为依赖的版本的原因，不同的时间下执行npm install 可能会下载到不同版本的  依赖。package.lock.json解决了这个问题，把依赖和依赖的依赖版本固定下来。 这样项目的各个开发者在执行npm install的时候，如果package.json的依赖包没有增加（手动删除里面的包或者版本号，不会触发package-lock.json更新，下载的时候还是以lock为准），就会按照package-lock.json去下载。要更lock的新版本号或者删除依赖，需要执行npm i xx@xx或者npm uninstall xx
+
+---
+
+
+**<a id="幽灵依赖">pnpm以及幽灵依赖</a>**  
+npm会把依赖和依赖的依赖，平铺安装在node_mudules下共享使用，如果遇到依赖版本有冲突，会把后加入的依赖放到依赖的node_modules下，以此类推。  
+npm上述把依赖包拍扁的做法，虽然解决了依赖嵌套的问题，但也带来了另外一个问题：依赖被平铺node_modules，导致项目没有在package.json引入的包，也能被导入（幽灵依赖，其他依赖导入了，平铺，yarn也存在同样的问题）。  
+**pnpm**解决方案：首先pnpm把所有项目的依赖包存在自己的.pnpm store，在项目的node_modules只存放本项目依赖的软连接，连接到.pnpm目录下的依赖，而.pnpm里面的依赖通过硬链接直接指向.pnpm store里面真实的文件。
+
+**优点**  
+1. 因为公用store里面的包，所以即使多个项目也不会产生多余的包。节省空间。
+2. 采用的软硬链接的方式，当有全局包缓存的时候，安装特别的快。
+3. 解决幽灵依赖的问题。
+
+**不足**
+1. 兼容性问题，由于symbolic link（软连接）在一些场景下有兼容性问题，目前 Eletron 以及 labmda 部署的应用上无法使用 pnpm。
+2. 由于共享全局的store，当某个项目修改了node_modules的源文件，那么其他公用了该文件的项目也会受到影响。
+
+---
 
 **<a id=".npmrc">.npmrc</a>**  
 
