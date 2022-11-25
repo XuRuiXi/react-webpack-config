@@ -94,6 +94,7 @@ module.exports = {
         {
           from: './src/public',
           to: 'public',
+          noErrorOnMissing: true,
           globOptions: {
             ignore: ["**/ignoreResources/**"],
           },

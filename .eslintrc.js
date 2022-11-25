@@ -15,6 +15,7 @@ module.exports = {
     'html', // html文件检测
   ],
   rules: {
+    "indent": ["error", 2],
     "no-console": 1,
     "no-alert": 1,
     semi: [2, "always"], // 语句强制分号结尾
