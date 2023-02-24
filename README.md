@@ -642,7 +642,8 @@ module.exports = {
       cleanOnceBeforeBuildPatterns: ['**/*', '!不会被删除的文件.html']
     }),
     new HtmlWebpackPlugin({
-      template: './src/public/index.html'
+      template: './src/public/index.html',
+      publicPath: '/'
     })
   ]
 }
@@ -1212,7 +1213,8 @@ module.exports = {
   },
   plugins: [
     new HtmlWebpackPlugin({
-      template: './src/public/ignoreResources/index.html'
+      template: './src/public/ignoreResources/index.html',
+      publicPath: '/'
     }),
     // ignore表示不会被复制的目录
     new CopyWebpackPlugin({

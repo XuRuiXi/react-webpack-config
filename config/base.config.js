@@ -86,7 +86,8 @@ module.exports = {
   },
   plugins: [
     new HtmlWebpackPlugin({
-      template: './src/public/ignoreResources/index.html'
+      template: './src/public/ignoreResources/index.html',
+      publicPath: '/'
     }),
     // ignore表示不会被复制的目录
     new CopyWebpackPlugin({
