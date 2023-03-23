@@ -14,7 +14,7 @@ const App = () => {
       <div className={styles.background}>
         REACT环境
       </div>
-      <组件一 />
+      <组件一 title='组件一' />
       <组件二 />
       <img src={截图1} />
       <div className={styles.pngBgSmall} />

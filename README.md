@@ -34,6 +34,9 @@
 <a href="#配置文件拆分">配置文件拆分</a>  
 <a href="#husky代码提交校验">husky代码提交校验</a>  
 
+---
+<a href="#性能优化相关专题">性能优化相关专题</a>  
+
 ---  
 **补充**  
 <a href="#package.json相关说明">package.json相关说明</a>  
@@ -315,7 +318,8 @@ import styles from './test.less';
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 plugins: [
   new HtmlWebpackPlugin({
-    template: './src/public/index.html'
+    template: './src/public/index.html',
+    publicPath: '/'
   })
 ]
 ```
@@ -353,9 +357,14 @@ new CopyWebpackPlugin({
     {
       from: './src/public',
       to: 'public',
+      noErrorOnMissing: true, // 当noErrorOnMissing设置为true时，如果源文件不存在，CopyWebpackPlugin不会抛出错误，而是跳过该文件的复制。
       globOptions: {
         ignore: ["**/ignoreResources/**"],
       },
+    },
+    {
+      from: './src/public/ignoreResources/favicon.ico',
+      to: '.',
     }
   ]
 })
@@ -1222,6 +1231,7 @@ module.exports = {
         {
           from: './src/public',
           to: 'public',
+          noErrorOnMissing: true, // 当noErrorOnMissing设置为true时，如果源文件不存在，CopyWebpackPlugin不会抛出错误，而是跳过该文件的复制。
           globOptions: {
             ignore: ["**/ignoreResources/**"],
           },
@@ -1415,7 +1425,36 @@ package.json
 
 配置完成后，当我们commit代码的时候，会基于eslint配置的规则，校验我们暂存区的代码，只有校验通过之后能提交。
 
+---
 
+**<a id="性能优化相关专题">性能优化相关专题</a>**  
+
+1）模块的动态导入  
+例如我们有个工具模块
+./utils.ts
+```ts
+const count = (num1:number, num2:number) => num1 + num2;
+export default count;
+```
+
+我们希望在使用到的时候，才对其进行导入，而不是一开始就导入，这样可以减少首屏加载的时间。
+  
+```ts
+const count = async () => {
+  const { default: count } = await import('./utils');
+  return count(1, 2);
+};
+```
+
+注意，如果在ts文件中使用import动态导入，需要在tsconfig.json中配置module为es2020（支持module的版本），否则会报错。
+
+```json
+{
+  "compilerOptions": {
+    "module": "es2020", // 模块化规范， es2020, commonjs, amd, umd, system
+  },
+}
+```
 ---
 
 **<a id="package.json相关说明">package.json相关说明</a>**  

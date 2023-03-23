@@ -95,7 +95,7 @@ module.exports = {
         {
           from: './src/public',
           to: 'public',
-          noErrorOnMissing: true,
+          noErrorOnMissing: true, // 当noErrorOnMissing设置为true时，如果源文件不存在，CopyWebpackPlugin不会抛出错误，而是跳过该文件的复制。
           globOptions: {
             ignore: ["**/ignoreResources/**"],
           },
