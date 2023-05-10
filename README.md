@@ -1461,8 +1461,8 @@ const count = async () => {
 
 - **dependencies、devDependencies、peerdependency区别**  
 
-  在本地开发时，没有本质的区别。只有在发布npm包时，如果对方使用npm包，在devDependencies里面的模块不会被对方下载。
-  peerdependency：告诉使用者，这个包依赖于某个模块，但是不会自动安装，需要使用者自己安装。
+  - **dependencies、devDependencies**：在本地开发时，没有本质的区别。只有在发布npm包时，如果对方使用npm包，在devDependencies里面的模块不会被对方下载。  
+  - **peerdependency**：告诉使用者，这个包依赖于某个模块，但是不会自动安装，需要使用者自己安装。例如在antd中，它依赖于react。因此为了让开发者不重复安装react，antd把react的依赖写在了devDependencies中，然后在peerDependencies中写上react，这样使用者在安装antd的时候，会提示安装react，但是不会自动安装react。
 
 
 - **版本符号**  
