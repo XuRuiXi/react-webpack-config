@@ -1459,9 +1459,11 @@ const count = async () => {
 
 **<a id="package.json相关说明">package.json相关说明</a>**  
 
-- **dependencies和devDependencies区别**  
+- **dependencies、devDependencies、peerdependency区别**  
 
-  在本地开发时，没有本质的区别。只有在发布npm包时，如果对方使用npm包，在开发依赖里面的模块不会被对方下载。
+  在本地开发时，没有本质的区别。只有在发布npm包时，如果对方使用npm包，在devDependencies里面的模块不会被对方下载。
+  peerdependency：告诉使用者，这个包依赖于某个模块，但是不会自动安装，需要使用者自己安装。
+
 
 - **版本符号**  
 
