@@ -972,6 +972,13 @@ test('1 + 2 = 3', () => {
 },
 ```
 
+在.eslintrc.js配置eslint支持jest
+```javascript
+env: {
+    jest: true, // 增加jest环境
+},
+```
+
 **Jest支持typescript和ESM**
 
 支持ESM只需要引入babel的预设@babel/preset-env就可以了，支持typescript需要我们在babel引入@babel/preset-typescript。

@@ -4,6 +4,7 @@ module.exports = {
     browser: true,
     es6: true,
     node: true,
+    jest: true
   },
   extends: [
     'plugin:react/recommended', // 使用来自 @eslint-plugin-react 的推荐规则
