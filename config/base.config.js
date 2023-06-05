@@ -7,6 +7,10 @@ module.exports = {
   performance: {
     "maxAssetSize": 1024 * 1024 // 1m 打包的asset资源，超过多少会提示
   },
+  // 开启缓存，提升二次构建速度
+  cache: {
+    type: 'filesystem', // 使用文件缓存
+  },
   // 自动补全省略的后缀
   resolve: {
     extensions: ['.js', '.jsx', '.json', '.ts', '.tsx'],
