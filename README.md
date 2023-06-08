@@ -13,16 +13,18 @@
 <a href="#修改webpack配置，配置入口文件、输出文件">修改webpack配置，配置入口文件、输出文件</a>  
 <a href="#配置react开发环境~~介绍babel-loader">配置react开发环境~~介绍babel-loader</a>  
 <a href="#配置css、less相关loader">配置css、less相关loader</a>  
+  - <a href="#开启样式分离">开启样式分离</a>
+
 <a href="#webpack插件">webpack插件</a>  
-- <a href="#html-webpack-plugin">html-webpack-plugin</a>  
-- <a href="#clean-webpack-plugin">clean-webpack-plugin</a>  
-- <a href="#copy-webpack-plugin">copy-webpack-plugin</a>  
+  - <a href="#html-webpack-plugin">html-webpack-plugin</a>  
+  - <a href="#clean-webpack-plugin">clean-webpack-plugin</a>  
+  - <a href="#copy-webpack-plugin">copy-webpack-plugin</a>  
 
 <a href="#从热更新到模块热替换(hot module replacement 或 HMR)">从热更新到模块热替换(hot module replacement 或 HMR)</a>  
 <a href="#代码兼容性处理">代码兼容性处理</a>  
 <a href="#抽离.babelrc和postcss.config.js">抽离.babelrc和postcss.config.js</a>  
 <a href="#typescript支持">typescript支持</a>  
-- <a href="#typescript模块声明">typescript模块声明</a>  
+  - <a href="#typescript模块声明">typescript模块声明</a>  
 
 <a href="#资源模块(asset module)">资源模块(asset module)</a>  
 <a href="#eslint支持">eslint支持</a>  
@@ -35,9 +37,19 @@
 <a href="#husky代码提交校验">husky代码提交校验</a>  
 
 ---
-<a href="#性能优化相关专题">性能优化相关专题</a>  
-- <a href="#1）模块的动态导入">1）模块的动态导入</a>  
-- <a href="#2）开启文件缓存，提升二次构建速度">2）开启文件缓存，提升二次构建速度</a>  
+<a href="#性能优化相关专题">性能优化相关专题</a>
+  - <a href="#优化构建速度">优化构建速度</a>
+    - <a href="#构建费时分析">构建费时分析</a>
+    - <a href="#缩小loader使用范围">缩小loader使用范围</a>
+    - <a href="#设置不解析的模块noParse">设置不解析的模块noParse</a>
+    - <a href="#开启文件缓存，提升二次构建速度">开启文件缓存，提升二次构建速度</a>
+    - <a href="#多进程配置">多进程配置</a>
+
+  - <a href="#模块的动态导入">模块的动态导入</a>
+  
+  
+  - <a href="#打包代码剔除externals">打包代码剔除externals</a>
+  
 
 ---  
 **补充**  
@@ -92,7 +104,7 @@ node_modules\.bin\webpack
 这里介绍2种覆盖webpack配置的方法  
 第一种是在根目录新建webpack.config.js，在这里修改之后，配置默认走这里。
 第二种可以自定义js文件名，但是在执行命令的时候，加上配置文件的路径
-```javascript
+```json
 "build": "webpack --config xrx.webpack.config.js"
 ```
 ```javascript
@@ -108,10 +120,11 @@ module.exports = {
 ```
 **entry**  
 入口文件：相对路径/绝对路径  
-**output**
+
+**output**  
 这里介绍3个属性  
 path：输出的文件夹，只能是绝对路径  
-filename：输出的文件名称
+filename：输出的文件名称  
 publicPath：默认是/，资源的存放路径（和服务器部署的路径有关）
 
 ----
@@ -162,6 +175,7 @@ module: {
   ]
 }
 ```
+
 此时我们对./src/index.js文件进行打包
 ```javascript
 import React from 'react';
@@ -187,7 +201,7 @@ createRoot(document.querySelector('#app')).render(<App />);
 ```
 ![](./src/assets/images/截图1.png)  
 此时react生效了。但是这里有不足的地方，就是用到的plugin有点多，而且随着时代的发展，不排除后续react环境加入更多的plugin。这样不断的在后面添加plugin，会显得不优雅，而且难以维护。所以接下来介绍  
-**预设（preset）**
+**预设（preset）**  
 预设（preset）其实就是一堆plugin的集合。为了方便我们使用别人维护好的插件集合，loader提供了presets属性，就像引入插件一样就行了。这里以react的preset为例  
 
 ```
@@ -308,6 +322,58 @@ createRoot(document.querySelector('#app')).render(<App />);
 import styles from './test.less';
 <div className={styles.background} />
 ```
+
+**<a id="开启样式分离">开启样式分离</a>**  
+取代style-loader，使用MiniCssExtractPlugin.loader。  
+这样打包的样式文件就不是通过style标签插入到html里面了，而是通过link标签引入css文件。  
+```javascript
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+module: {
+    rules: [
+      {
+        test: /\.css$/,
+        // 使用多个loader的方式
+        use: [
+          // 'style-loader',
+          MiniCssExtractPlugin.loader,
+          {
+            loader: 'css-loader',
+            options: {
+              importLoaders: 1,
+            }
+          },
+          'postcss-loader'
+        ]
+      },
+      {
+        test: /\.less$/,
+        // 使用多个loader的方式  
+        use: [
+          // 'style-loader',
+          MiniCssExtractPlugin.loader,
+          {
+            loader: 'css-loader',
+            options: {
+              // 开启css模块化
+              modules: {
+                localIdentName: '[local]_[hash:5]'
+              },
+              importLoaders: 1,
+            }
+          },
+          'postcss-loader',
+          'less-loader'
+        ]
+      }
+    ]
+},
+plugins: [
+  new MiniCssExtractPlugin({
+    filename: 'css/[name].[contenthash:5].css'
+  })
+]
+```
+
 
 **<a id="webpack插件">webpack插件</a>**  
 
@@ -1059,6 +1125,12 @@ module.exports = {
     alias: {
       '@': path.resolve(__dirname, './src'),
     },
+    // 告诉webpack解析模块时应该搜索的目录
+    modules: ['node_modules', resolve('src')],
+    // 告诉webpack解析loader时应该搜索的目录
+    resolveLoader: {
+      modules: ['node_modules',resolve('loader')]
+    },
   },
 }
 ```
@@ -1157,6 +1229,12 @@ module.exports = {
     extensions: ['.js', '.jsx', '.json', '.ts', '.tsx'],
     alias: {
       '@': path.resolve(__dirname, '../src'),
+    },
+    // 告诉webpack解析模块时应该搜索的目录
+    modules: ['node_modules', resolve('src')],
+    // 告诉webpack解析loader时应该搜索的目录
+    resolveLoader: {
+      modules: ['node_modules', resolve('loader')]
     },
   },
   module: {
@@ -1434,11 +1512,98 @@ package.json
 
 配置完成后，当我们commit代码的时候，会基于eslint配置的规则，校验我们暂存区的代码，只有校验通过之后能提交。
 
+
 ---
 
 **<a id="性能优化相关专题">性能优化相关专题</a>**  
 
-<a id="1）模块的动态导入">1）模块的动态导入</a>  
+---
+
+
+**<a href="#优化构建速度">优化构建速度</a>**
+
+
+- **<a id="构建费时分析">构建费时分析</a>**  
+
+使用**speed-measure-webpack-plugin**插件，可以分析每个loader和plugin的耗时，从而找到构建费时的原因。
+
+webpack.config.js
+```js
+const SpeedMeasurePlugin = require('speed-measure-webpack-plugin');
+const smp = new SpeedMeasurePlugin();
+module.exports = smp.wrap({
+  // ...
+});
+```
+
+- **<a id="缩小loader使用范围">缩小loader使用范围</a>**
+
+配置loader的include 和 exclude 两个配置项
+
+```
+include：符合条件的模块进行解析（如果设置了这个，那么就只解析这个）
+exclude：排除符合条件的模块，不解析（优先级最高）
+```
+
+- **<a id="设置不解析的模块noParse">设置不解析的模块noParse</a>**  
+
+设置了该字段后，webpack将不会解析该模块了，从而提高构建速度。但是需要注意的是，如果该模块中没有其他依赖，那么可以设置该字段，否则会导致该模块中的依赖无法解析，从而导致构建失败。
+
+```js
+const config = {
+  //...
+  module: { 
+    noParse: /jquery|lodash/,
+    rules:[...]
+  }
+};
+```
+
+![](./src/assets/images/noParse.png)
+
+
+- **<a id="开启文件缓存，提升二次构建速度">开启文件缓存，提升二次构建速度</a>**  
+
+首次构建，webpack会把构建好的缓存文件写到node_modules/.cache/webpack目录下，二次构建的时候，会从这个目录下读取缓存文件，如果缓存文件没有变化，就不会重新构建，从而提升构建速度。
+
+```js
+module.exports = {
+  // ...
+  cache: {
+    type: 'filesystem',
+  },
+};
+```
+
+
+- **<a id="多进程配置">多进程配置</a>**  
+
+loader：**thread-loader**  
+开启子进程，会有额外的性能开销，webpack官网提示大概消耗600ms，所以只有当loader处理时间比较长的时候，才会考虑使用该loader。
+
+```js
+const config = {
+  module: { 
+    rules: [
+      {
+        test: /\.js$/i,
+        use: [
+          {
+            loader: 'thread-loader', // 开启多进程打包
+            options: {
+              worker: 3,
+            }
+          },
+          'babel-loader',
+        ]
+      },
+    ]
+  }
+};
+```
+
+
+**<a id="模块的动态导入">模块的动态导入</a>**  
 例如我们有个工具模块
 ./utils.ts
 ```ts
@@ -1455,31 +1620,25 @@ const count = async () => {
 };
 ```
 
-注意，如果在ts文件中使用import动态导入，需要在tsconfig.json中配置module为es2020（支持module的版本），否则会报错。
 
-```json
-{
-  "compilerOptions": {
-    "module": "es2020", // 模块化规范， es2020, commonjs, amd, umd, system
-  },
-}
-```
-
-<a id="2）开启文件缓存，提升二次构建速度">2）开启文件缓存，提升二次构建速度</a>  
-
+**<a id="打包代码剔除externals">打包代码剔除externals</a>**  
+一般在写library的时候很好用。下面的代码会在打包的时候，把jquery从打包文件中剔除，使用外部的jquery。
 ```js
-module.exports = {
-  // ...
-  cache: {
-    type: 'filesystem',
+const config = {
+  //...
+  externals: {
+    jquery: 'jQuery',
   },
 };
 ```
 
 
+
 ---
 
 **<a id="package.json相关说明">package.json相关说明</a>**  
+
+---
 
 - **dependencies、devDependencies、peerdependency区别**  
 

@@ -8,27 +8,34 @@ module.exports = {
     "maxAssetSize": 1024 * 1024 // 1m 打包的asset资源，超过多少会提示
   },
   // 开启缓存，提升二次构建速度
-  cache: {
-    type: 'filesystem', // 使用文件缓存
-  },
-  // 自动补全省略的后缀
+  // cache: {
+  //   type: 'filesystem', // 使用文件缓存
+  // },
   resolve: {
+    // 可以省略的后缀
     extensions: ['.js', '.jsx', '.json', '.ts', '.tsx'],
+    // 别名
     alias: {
       '@': path.resolve(__dirname, '../src'),
     },
   },
   module: {
+    noParse: /lodash-es/,
     rules: [
       {
         test: /\.js$/,
-        loader: 'babel-loader',
+        use: [
+          'babel-loader'
+        ],
         exclude: /node_modules/, // 不处理的文件夹
       },
       {
         test: /\.(ts|tsx)$/,
         exclude: /node_modules/, // 不处理的文件夹
-        use: ['babel-loader', 'ts-loader'],
+        use: [
+          'babel-loader', 
+          'ts-loader'
+        ],
       },
       {
         test: /\.css$/,

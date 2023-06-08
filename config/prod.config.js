@@ -2,12 +2,13 @@ const path = require('path');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 
 module.exports = {
-  mode: 'production',
-  devtool: false, // false source-map eval
+  mode: 'development',
+  devtool: false, // false source-map eval eval-cheap-module-source-map
   output: {
     path: path.resolve(__dirname, '../dist'),
     filename: '[name].js',
     // publicPath: '',
+    // name表示文件名，ext表示文件扩展名
     assetModuleFilename: 'resources/[name].[hash:5][ext]'
   },
   // optimization: {
