@@ -38,17 +38,22 @@
 
 ---
 <a href="#性能优化相关专题">性能优化相关专题</a>
-  - <a href="#优化构建速度">优化构建速度</a>
+  - <a href="#优化打包速度">优化打包速度</a>
     - <a href="#构建费时分析">构建费时分析</a>
     - <a href="#缩小loader使用范围">缩小loader使用范围</a>
     - <a href="#设置不解析的模块noParse">设置不解析的模块noParse</a>
     - <a href="#开启文件缓存，提升二次构建速度">开启文件缓存，提升二次构建速度</a>
     - <a href="#多进程配置">多进程配置</a>
 
-  - <a href="#模块的动态导入">模块的动态导入</a>
-  
-  
-  - <a href="#打包代码剔除externals">打包代码剔除externals</a>
+  - <a href="#优化打包结果">优化打包结果</a>
+    - <a href="#打包结果分析">打包结果分析</a>
+    - <a href="#代码压缩">代码压缩</a>
+    - <a href="#tree-shaking">tree-shaking</a>
+    - <a href="#打包代码剔除externals">打包代码剔除externals</a>
+
+  - <a href="#优化运行时体验">优化运行时体验</a>
+    - <a href="#模块的动态导入和预加载">模块的动态导入和预加载</a>
+    - <a href="#分包配置splitChunks">分包配置splitChunks</a>
   
 
 ---  
@@ -324,7 +329,7 @@ import styles from './test.less';
 ```
 
 **<a id="开启样式分离">开启样式分离</a>**  
-取代style-loader，使用MiniCssExtractPlugin.loader。  
+取代style-loader，使用MiniCssExtractPlugin.loader。（与分析loader时间的插件speed-measure-webpack-plugin有冲突）  
 这样打包的样式文件就不是通过style标签插入到html里面了，而是通过link标签引入css文件。  
 ```javascript
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
@@ -1520,7 +1525,7 @@ package.json
 ---
 
 
-**<a href="#优化构建速度">优化构建速度</a>**
+**<a id="优化打包速度">优化打包速度</a>**
 
 
 - **<a id="构建费时分析">构建费时分析</a>**  
@@ -1602,26 +1607,60 @@ const config = {
 };
 ```
 
+**<a id="优化打包结果">优化打包结果</a>**
 
-**<a id="模块的动态导入">模块的动态导入</a>**  
-例如我们有个工具模块
-./utils.ts
-```ts
-const count = (num1:number, num2:number) => num1 + num2;
-export default count;
+- **<a id="打包结果分析">打包结果分析</a>**  
+
+```js
+const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
+
+plugins: [
+    new BundleAnalyzerPlugin({
+      // analyzerMode: 'disabled',  // 不启动展示打包报告的http服务器
+      // generateStatsFile: true, // 是否生成stats.json文件
+    }),
+]
+```
+这时候我们直接运行npm run build，就会自动打开一个http服务器，展示打包结果分析报告。(这里的--progress参数是为了展示打包进度)
+```json
+"build": "cross-env NODE_ENV=production webpack --progress --config config/webpack.config.js",
 ```
 
-我们希望在使用到的时候，才对其进行导入，而不是一开始就导入，这样可以减少首屏加载的时间。
-  
-```ts
-const count = async () => {
-  const { default: count } = await import('./utils');
-  return count(1, 2);
-};
+
+- **<a id="代码压缩">代码压缩</a>**  
+
+压缩 CSS和JS
+```js
+// 如果使用了样式分离，那么使用这个插件压缩css还是有帮助的
+const OptimizeCssAssetsPlugin = require('optimize-css-assets-webpack-plugin');
+/* 
+  生产环境会默认将js代码压缩，但是当我们手动配置optimization.minimize为false的时候，就需要手动配置js代码压缩了
+*/
+const TerserPlugin = require('terser-webpack-plugin');
+
+const config = {
+  // ...
+  optimization: {
+    minimize: true, // 表示开启代码压缩
+    minimizer: [
+      // 添加 css 压缩配置
+      new OptimizeCssAssetsPlugin({}),
+      // 添加 js 压缩配置
+      new TerserPlugin({})
+    ]
+  },
+ // ...
+}
 ```
 
+- **<a href="tree-shaking">tree-shaking</a>**
 
-**<a id="打包代码剔除externals">打包代码剔除externals</a>**  
+其原理在于ES6模块系统中的静态结构。在ES6模块系统中，一旦导出一个标识符，它就变成了一个已知实体。
+webpack5中默认开启。需要注意的是，ts/tsx文件中，tsconfig.json配置的target（输出）必须es2015以上。
+
+
+- **<a id="打包代码剔除externals">打包代码剔除externals</a>**  
+
 一般在写library的时候很好用。下面的代码会在打包的时候，把jquery从打包文件中剔除，使用外部的jquery。
 ```js
 const config = {
@@ -1633,6 +1672,31 @@ const config = {
 ```
 
 
+**<a href="#优化运行时体验">优化运行时体验</a>**
+
+- **<a id="模块的动态导入和预加载">模块的动态导入和预加载</a>**  
+
+例如我们有个工具模块  
+./utils.ts
+
+```ts
+const count = (num1:number, num2:number) => num1 + num2;
+export default count;
+```
+
+我们希望在使用到的时候，才对其进行导入，而不是一开始就导入，这样可以减少首屏加载的时间。  
+/* webpackPrefetch: true */表示在浏览器空闲的时候，提前加载该模块。  
+本质是通过link标签，设置rel="prefetch"，浏览器会在空闲的时候，提前加载该模块。然后用到该模块的时候，会从缓存中读取，从而提升体验。
+
+```ts
+const count = async () => {
+  const { default: count } = await import(/* webpackPrefetch: true */'./utils');
+  return count(1, 2);
+};
+```
+
+- **<a id="分包配置splitChunks">分包配置splitChunks</a>**
+待续。
 
 ---
 

@@ -2,7 +2,7 @@ const path = require('path');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 
 module.exports = {
-  mode: 'development',
+  mode: 'production',
   devtool: false, // false source-map eval eval-cheap-module-source-map
   output: {
     path: path.resolve(__dirname, '../dist'),
@@ -11,12 +11,12 @@ module.exports = {
     // name表示文件名，ext表示文件扩展名
     assetModuleFilename: 'resources/[name].[hash:5][ext]'
   },
-  // optimization: {
-  //   // 代码分割
-  //   splitChunks: {
-  //     chunks: 'all',
-  //   }
-  // },
+  // 代码分割
+  optimization: {
+    splitChunks: {
+      chunks: 'initial', // 有效值为 `all`，`async` 和 `initial`
+    },
+  },
   plugins: [
     // **/*表示会取output.path的目录
     // !取反，表示不会被删除

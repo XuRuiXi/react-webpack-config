@@ -7,7 +7,7 @@ interface props {
 const TsCop = (props: props) => {
   const { title = '组件一' } = props;
   const count = async () => {
-    const { default: count } = await import('./utils');
+    const { default: count } = await import(/* webpackPrefetch: true */ './utils');
     console.log(count(1, 2));
   };
   return (

@@ -1,11 +1,18 @@
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
+// 样式分离插件
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+// 压缩css
+const OptimizeCssAssetsPlugin = require('optimize-css-assets-webpack-plugin');
+
+// 打包结果分析插件
+// const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 
 module.exports = {
   entry: './src/index.tsx',
   performance: {
-    "maxAssetSize": 1024 * 1024 // 1m 打包的asset资源，超过多少会提示
+    maxAssetSize: 1024 * 1024 // 1m 打包的asset资源，超过多少会提示
   },
   // 开启缓存，提升二次构建速度
   // cache: {
@@ -20,7 +27,6 @@ module.exports = {
     },
   },
   module: {
-    noParse: /lodash-es/,
     rules: [
       {
         test: /\.js$/,
@@ -39,9 +45,10 @@ module.exports = {
       },
       {
         test: /\.css$/,
-        // 使用多个loader的方式
         use: [
-          'style-loader',
+          // 取代style-loader实现样式分离
+          MiniCssExtractPlugin.loader,
+          // 'style-loader',
           {
             loader: 'css-loader',
             options: {
@@ -55,7 +62,8 @@ module.exports = {
         test: /\.less$/,
         // 使用多个loader的方式  
         use: [
-          'style-loader',
+          // 'style-loader',
+          MiniCssExtractPlugin.loader,
           {
             loader: 'css-loader',
             options: {
@@ -96,6 +104,15 @@ module.exports = {
     ]
   },
   plugins: [
+    // new BundleAnalyzerPlugin({
+    //   // analyzerMode: 'disabled',  // 不启动展示打包报告的http服务器
+    //   // generateStatsFile: true, // 是否生成stats.json文件
+    // }),
+    // 添加 css 压缩配置
+    new OptimizeCssAssetsPlugin({}),
+    new MiniCssExtractPlugin({
+      filename: 'css/[name].[contenthash:5].css',
+    }),
     new HtmlWebpackPlugin({
       template: './src/public/ignoreResources/index.html',
       publicPath: '/'

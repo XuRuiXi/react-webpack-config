@@ -26,3 +26,8 @@ const App = () => {
 };
 
 createRoot(document.querySelector('#app')).render(<App />);
+
+
+import { cloneDeep } from 'lodash-es';
+
+console.log(cloneDeep({a: 1}));
