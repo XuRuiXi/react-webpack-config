@@ -6,8 +6,6 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 // 压缩css
 const OptimizeCssAssetsPlugin = require('optimize-css-assets-webpack-plugin');
 
-// 打包结果分析插件
-// const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 
 module.exports = {
   entry: './src/index.tsx',
@@ -104,10 +102,6 @@ module.exports = {
     ]
   },
   plugins: [
-    // new BundleAnalyzerPlugin({
-    //   // analyzerMode: 'disabled',  // 不启动展示打包报告的http服务器
-    //   // generateStatsFile: true, // 是否生成stats.json文件
-    // }),
     // 添加 css 压缩配置
     new OptimizeCssAssetsPlugin({}),
     new MiniCssExtractPlugin({

@@ -9,7 +9,7 @@ let presets = [
       // usage 根据源代码需要哪些polyfil就引入相关的api
       // entry 只要是浏览器需要的polyfill都引入(不是根据源代码应用哪polyfill)
       "useBuiltIns": "usage", // false "usage" "entry"
-      "corejs": "3", // useBuiltIns为usage时需要声明core-js的版本为3
+      "corejs": "3", // useBuiltIns为usage时需要声明core-js的版本为3。因为只有core-js@3以上的版本，才会包含core-js/stable
     }
   ],
   "@babel/preset-react",

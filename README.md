@@ -6,6 +6,7 @@
 - eslint配置相关 ✔
 - 支持单元测试Jest ✔
 - husky代码提交校验 ✔
+- 性能优化专题 ✔
 - 解释package.json相关知识 ✔
 
 ## 目录  
@@ -601,7 +602,7 @@ npm install -D postcss-preset-env
 
 **js**  
 
-处理js语法兼容性问题，不同的问题用到不同的插件。这里为了方便用到了babel-loader的预设@babel/preset-env，预设集成了各种语法转换插件。babel7以后，移除了@babel/preset-stage-x。@babel/preset-env默认支持所有最新的语法。如果需要支持stage阶段，需要另外单独引入plugin
+处理js语法兼容性问题，不同的问题用到不同的插件。这里为了方便用到了babel-loader的预设@babel/preset-env，预设集成了各种语法转换插件。babel7以后，移除了@babel/preset-stage-x。@babel/preset-env默认支持所有最新的语法。（只支持stage4，即完成阶段）如果需要支持stage阶段，需要另外单独引入plugin。
 
 ```
 npm install -D @babel/preset-env
@@ -1695,8 +1696,181 @@ const count = async () => {
 };
 ```
 
-- **<a id="分包配置splitChunks">分包配置splitChunks</a>**
-待续。
+- **<a id="分包配置splitChunks">分包配置splitChunks</a>**  
+
+splitChunks.chunks 的作用是指示采用什么样的方式来优化分离 chunks，常用的有三种常用的取值：**async、initial 和 all，async 是默认值**
+
+基本配置：我们有3个入口文件。
+```js
+const path = require('path');
+const BundleAnalyzerPlugin =
+  require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
+
+module.exports = {
+  mode: 'development',
+  entry: {
+    a: './src/a.js',
+    b: './src/b.js',
+    c: './src/c.js',
+  },
+  output: {
+    path: path.resolve(__dirname, 'dist'),
+    filename: '[name].bundle.js',
+    clean: true,
+  },
+  optimization: {
+    splitChunks: {
+      chunks: 'async',
+    },
+  },
+  plugins: [new BundleAnalyzerPlugin()],
+};
+```
+
+**async**  
+- 只分离通过import()异步加载的chunks
+
+```js
+// a.js
+import('./utils/m1');
+import './utils/m2';
+
+console.log('some code in a.js');
+
+// b.js
+import('./utils/m1');
+import './utils/m2';
+
+console.log('some code in a.js');
+
+// c.js
+import('./utils/m1');
+import './utils/m2';
+
+console.log('some code in c.js');
+```
+
+打包结果
+![](./src/assets/images/打包1.png)  
+
+
+
+**initial和all**  
+- 在单入口的情况下，initial和all一样，同步和异步的chunks都会被分离。如果是多入口，如下：
+
+```js
+// a.js
+import('./utils/m1');
+import './utils/m2';
+import './utils/m3'; // 新加的。
+
+console.log('some code in a.js');
+
+// b.js
+import('./utils/m1');
+import './utils/m2';
+import('./utils/m3'); // 新加的。
+
+console.log('some code in a.js');
+
+// c.js
+import('./utils/m1');
+import './utils/m2';
+
+console.log('some code in c.js');
+```
+
+initial的结果
+![](./src/assets/images/打包2.png)  
+
+all的结果
+
+![](./src/assets/images/打包3.png)  
+
+
+**对比：**
+- 在 **initial** 设置下，多入口情况下，就算导入的是同一个模块，但是同步导入和异步导入是不能复用的。
+- 在 **all** 设置下，同步和异步的导入会被复用。
+
+
+
+
+**cacheGroups**
+- 通过 cacheGroups，可以自定义 chunk 输出分组。设置 test 对模块进行过滤，符合条件的模块分配到相同的组。如下配置：
+
+1、node_modules 下的模块全部分离并输出到 vendors.bundle.js 文件中。
+2、utils/ 目录下有一系列的工具模块文件，在打包的时候都打到一个 utils.bundle.js 文件中
+
+```js
+const path = require('path');
+const BundleAnalyzerPlugin =
+  require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
+
+module.exports = {
+  mode: 'development',
+  entry: {
+    a: './src/a.js',
+    b: './src/b.js',
+    c: './src/c.js',
+  },
+  output: {
+    path: path.resolve(__dirname, 'dist'),
+    filename: '[name].bundle.js',
+    clean: true,
+  },
+  optimization: {
+    splitChunks: {
+      chunks: 'all',
+      minSize: 0,
+      cacheGroups: {
+        vendors: {
+          test: /[\\/]node_modules[\\/]/,
+          priority: -10,
+          reuseExistingChunk: true,
+          name: 'vendors',
+        },
+        default: {
+          test: /[\\/]utils[\\/]/,
+          priority: -20,
+          reuseExistingChunk: true,
+          name: 'utils',
+        },
+      },
+    },
+  },
+  plugins: [new BundleAnalyzerPlugin()],
+};
+```
+
+入口文件
+```js
+// a.js
+import React from 'react';
+import ReactDOM from 'react-dom';
+import('./utils/m1');
+import './utils/m2';
+
+console.log('some code in a.js');
+
+// b.js
+import React from 'react';
+import './utils/m2';
+import './utils/m3';
+
+console.log('some code in a.js');
+
+// c.js
+import ReactDOM from 'react-dom';
+import './utils/m3';
+
+console.log('some code in c.js');
+```
+打包结果：
+![](./src/assets/images/打包4.png)
+![](./src/assets/images/打包5.png)    
+
+
+
 
 ---
 
