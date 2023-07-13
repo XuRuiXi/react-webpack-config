@@ -754,11 +754,24 @@ webpack.config.json配置
 ```javascript
 {
   "compilerOptions": {
-    "target": "ES5", // 编译后的目标javascript版本， ES5, ES6/ES2015, ES2016, ES2017, ES2018, ES2019, ES2020, ESNext
+    // 编译后的代码放在dist目录下，如果不设置这个选项，编译后的代码会放在和tsconfig.json同级的目录下。导致代码混乱
+    "outDir": "dist",
+    // target设置为ES2020是为了让ts编译后交给babel编译的源代码包含import之类的，这样可以支持tree shaking
+    "target": "ES2020", //编译后的目标javascript版本， ES5, ES6/ES2015, ES2016, ES2017, ES2018, ES2019, ES2020, ESNext
     "jsx": "react", // jsx编译成功react模式，生成React.createElement
-    "esModuleInterop": true, //允许我们使用commonjs的方式import默认文件， import React from 'react'
-  }
+    "esModuleInterop": true, // esModuleInterop的作用是为了让ts编译后的代码可以使用commonjs的模块引入方式
+    "moduleResolution": "node", // 模块解析策略，node或classic
+    // 让ts代码支持import动态导入等新功能
+    "module": "es2020", // 模块化方案，ES6, ESNext, CommonJS, AMD, System, UMD, ES2015, ES2020, ESNext
+    "baseUrl": "./",
+    // 让配置同样支持js文件
+    "allowJs": true,
+    "paths": {
+      "@/*": ["./src/*"]
+    }
+  },
 }
+
 ```
 
 配置完这2个地方之后，就能正常书写ts和tsx文件了  
